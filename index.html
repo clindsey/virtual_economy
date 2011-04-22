@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>virtual economy</title>
+    <script type="text/javascript" src="vendor.js"></script>
+    <script type="text/javascript" src="virtual_economy.js"></script>
+    <script type="text/javascript">
+      var player;
+      var on_load = function(){
+        player = new Player(0,100,new Economy(256));
+        display_current_market();
+      };
+      var display_current_market = function(){
+        $("market").innerHTML = tmpl("market_tmpl",{'market':player.market,'player':player});
+      };
+      var buy_good = function(type){
+        player.purchase(type);
+        display_current_market();
+      };
+      var sell_good = function(type){
+        player.sell(type);
+        display_current_market();
+      };
+      var buy_fuel = function(){
+        player.refuel();
+        display_current_market();
+      };
+      var travel_to = function(index){
+        player.travel_to(index);
+        display_current_market();
+      };
+    </script>
+    <style type="text/css">
+    </style>
+  </head>
+  <body onload="on_load()">
+    <div id="market">
+    </div>
+    <script type="text/html" id="market_tmpl">
+      <div id="player_location">
+        <h1><%= market.name %></h1>
+      </div>
+      <div id="player_fuel">
+        <label>Fuel</label>
+        <span>
+          <%= player.fuel %>
+        </span>
+      </div>
+      <ul id="market_neighbors">
+        <% for(var i = 0, il = market.neighbors.length; i < il; i++){ %>
+          <li>
+            <a href="javascript://" onclick="travel_to(<%= market.neighbors[i].index %>)"><%= market.neighbors[i].name %></a> 
+            <%= market.neighbors[i].distance %>
+          </li>
+        <% } %>
+      </ul>
+      <div id="player_credits">
+        <label>Credits</label>
+        <span>
+          <%= player.credits %>
+        </span>
+      </div>
+      <ul id="market_goods">
+        <% for(var o in market.goods){ %>
+          <li>
+            <span class="market-good-name">
+              <%= o %>
+            </span>
+            <span class="market-good-price">
+              <%= market.goods[o] %>
+            </span>
+            <a href="javascript://" onclick="buy_good('<%= o %>')">Buy</a>
+            <span class="player-good-qty">
+              <%= player.goods[o] %>
+            </span>
+            <a href="javascript://" onclick="sell_good('<%= o %>')">Sell</a>
+          </li>
+        <% } %>
+        <li>
+          <span class="market-good-name">
+            fuel
+          </span>
+          <span class="market-good-price">
+            <%= market.fuel_price %>
+          </span>
+          <a href="javascript://" onclick="buy_fuel()">Buy</a>
+        </li>
+      </ul>
+    </script>
+  </body>
+</html>
